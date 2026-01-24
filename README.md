@@ -1,2 +1,2 @@
 # palestra-show-dashboard
-palestra-show-checkin
+palestra-show-dashboard
