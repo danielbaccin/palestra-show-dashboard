@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard de Vendas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin: 30px 0 10px;
+      color: #333;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .card h3 {
+      font-size: 14px;
+      font-weight: normal;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 26px;
+      font-weight: bold;
+      margin: 0;
+      color: #111;
+    }
+
+    .money {
+      color: #16a34a;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Dashboard de Ingressos</h1>
+
+  <!-- VENDAS -->
+  <h2>💰 Vendas</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Total em vendas</h3>
+      <p class="money">R$ <span id="totalVendas">—</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Inteiras vendidas</h3>
+      <p><span id="qtdInteiras">—</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Meias vendidas</h3>
+      <p><span id="qtdMeias">—</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Cortesias</h3>
+      <p><span id="qtdCortesias">—</span></p>
+    </div>
+  </div>
+
+  <!-- DISPONÍVEIS -->
+  <h2>🎟️ Disponíveis</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Total disponível</h3>
+      <p class="money">R$ <span id="totalDisponiveis">—</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Inteiras disponíveis</h3>
+      <p><span id="qtdInteirasDisponiveis">—</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Meias disponíveis</h3>
+      <p><span id="qtdMeiasDisponiveis">—</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Cortesias disponíveis</h3>
+      <p><span id="qtdCortesiasDisponiveis">—</span></p>
+    </div>
+  </div>
+
+  <footer>
+    Atualizado automaticamente via n8n
+  </footer>
+
+  <script>
+    // 🔗 URL DO WEBHOOK DO DASHBOARD
+    const DASHBOARD_URL = 'https://n8n.kenuiworks.cloud/webhook/dashboard';
+
+    function formatBR(value) {
+      return Number(value).toLocaleString('pt-BR');
+    }
+
+    fetch(DASHBOARD_URL)
+      .then(response => response.json())
+      .then(data => {
+        // vendas
+        document.getElementById('totalVendas').innerText = formatBR(data.totalVendas);
+        document.getElementById('qtdInteiras').innerText = data.qtdInteiras;
+        document.getElementById('qtdMeias').innerText = data.qtdMeias;
+        document.getElementById('qtdCortesias').innerText = data.qtdCortesias;
+
+        // disponíveis
+        document.getElementById('totalDisponiveis').innerText = formatBR(data.totalDisponiveis);
+        document.getElementById('qtdInteirasDisponiveis').innerText = data.qtdInteirasDisponiveis;
+        document.getElementById('qtdMeiasDisponiveis').innerText = data.qtdMeiasDisponiveis;
+        document.getElementById('qtdCortesiasDisponiveis').innerText = data.qtdCortesiasDisponiveis;
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Erro ao carregar dados do dashboard');
+      });
+  </script>
+
+</body>
+</html>
