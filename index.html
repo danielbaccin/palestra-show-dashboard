@@ -23,6 +23,11 @@
       color: #333;
     }
 
+    /* DASHBOARD */
+    #dashboard {
+      display: none;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -61,66 +66,99 @@
       font-size: 12px;
       color: #888;
     }
+
+    /* LOADER */
+    #loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 60vh;
+      flex-direction: column;
+      gap: 12px;
+      color: #555;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #ddd;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
   </style>
 </head>
 <body>
 
   <h1>📊 Dashboard de Ingressos</h1>
 
-  <!-- VENDAS -->
-  <h2>💰 Vendas</h2>
-  <div class="grid">
-    <div class="card">
-      <h3>Total em vendas</h3>
-      <p class="money">R$ <span id="totalVendas">—</span></p>
-    </div>
-
-    <div class="card">
-      <h3>Inteiras vendidas</h3>
-      <p><span id="qtdInteiras">—</span></p>
-    </div>
-
-    <div class="card">
-      <h3>Meias vendidas</h3>
-      <p><span id="qtdMeias">—</span></p>
-    </div>
-
-    <div class="card">
-      <h3>Cortesias</h3>
-      <p><span id="qtdCortesias">—</span></p>
-    </div>
+  <!-- LOADING -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <div>Carregando dados...</div>
   </div>
 
-  <!-- DISPONÍVEIS -->
-  <h2>🎟️ Disponíveis</h2>
-  <div class="grid">
-    <div class="card">
-      <h3>Total disponível</h3>
-      <p class="money">R$ <span id="totalDisponiveis">—</span></p>
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+
+    <h2>💰 Vendas</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Total em vendas</h3>
+        <p class="money">R$ <span id="totalVendas">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Inteiras vendidas</h3>
+        <p><span id="qtdInteiras">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Meias vendidas</h3>
+        <p><span id="qtdMeias">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Cortesias</h3>
+        <p><span id="qtdCortesias">—</span></p>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Inteiras disponíveis</h3>
-      <p><span id="qtdInteirasDisponiveis">—</span></p>
+    <h2>🎟️ Disponíveis</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Total disponível</h3>
+        <p class="money">R$ <span id="totalDisponiveis">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Inteiras disponíveis</h3>
+        <p><span id="qtdInteirasDisponiveis">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Meias disponíveis</h3>
+        <p><span id="qtdMeiasDisponiveis">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Cortesias disponíveis</h3>
+        <p><span id="qtdCortesiasDisponiveis">—</span></p>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Meias disponíveis</h3>
-      <p><span id="qtdMeiasDisponiveis">—</span></p>
-    </div>
-
-    <div class="card">
-      <h3>Cortesias disponíveis</h3>
-      <p><span id="qtdCortesiasDisponiveis">—</span></p>
-    </div>
+    <footer>
+      Produced by Kenuiworks.cloud
+    </footer>
   </div>
-
-  <footer>
-    Atualizado automaticamente via n8n
-  </footer>
 
   <script>
-    // 🔗 URL DO WEBHOOK DO DASHBOARD
     const DASHBOARD_URL = 'https://n8n.kenuiworks.cloud/webhook/dashboard';
 
     function formatBR(value) {
@@ -128,23 +166,26 @@
     }
 
     fetch(DASHBOARD_URL)
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
-        // vendas
         document.getElementById('totalVendas').innerText = formatBR(data.totalVendas);
         document.getElementById('qtdInteiras').innerText = data.qtdInteiras;
         document.getElementById('qtdMeias').innerText = data.qtdMeias;
         document.getElementById('qtdCortesias').innerText = data.qtdCortesias;
 
-        // disponíveis
         document.getElementById('totalDisponiveis').innerText = formatBR(data.totalDisponiveis);
         document.getElementById('qtdInteirasDisponiveis').innerText = data.qtdInteirasDisponiveis;
         document.getElementById('qtdMeiasDisponiveis').innerText = data.qtdMeiasDisponiveis;
         document.getElementById('qtdCortesiasDisponiveis').innerText = data.qtdCortesiasDisponiveis;
+
+        // troca loader pelo dashboard
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
       })
       .catch(err => {
         console.error(err);
-        alert('Erro ao carregar dados do dashboard');
+        document.getElementById('loader').innerText =
+          'Erro ao carregar dados do dashboard';
       });
   </script>
 
