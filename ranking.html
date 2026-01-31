@@ -62,13 +62,15 @@ tr:nth-child(even) {
 
 <table>
   <thead>
-    <tr>
-      <th>#</th>
-      <th>Vendedor</th>
-      <th>Qtd</th>
-      <th>Valor</th>
-    </tr>
-  </thead>
+  <tr>
+    <th>#</th>
+    <th>Vendedor</th>
+    <th>Qtde Total</th>
+    <th>Qtde Inteiras</th>
+    <th>Qtde Meias</th>
+    <th>Valor</th>
+  </tr>
+</thead>
   <tbody id="rankingBody"></tbody>
 </table>
 
@@ -86,16 +88,18 @@ fetch(URL)
 
 function render(list) {
   rankingBody.innerHTML = '';
-  list.forEach((v, i) => {
-    rankingBody.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${v.vendedor}</td>
-        <td>${v.qtd}</td>
-        <td class="money">R$ ${v.valor.toLocaleString('pt-BR')}</td>
-      </tr>
-    `;
-  });
+  list.forEach(v => {
+  rankingBody.innerHTML += `
+    <tr>
+      <td>${v.posicao}</td>
+      <td>${v.vendedor}</td>
+      <td>${v.qtdTotal}</td>
+      <td>${v.qtdInteiras}</td>
+      <td>${v.qtdMeias}</td>
+      <td class="money">R$ ${v.valor.toLocaleString('pt-BR')}</td>
+    </tr>
+  `;
+});
 }
 
 search.addEventListener('input', e => {
