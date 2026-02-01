@@ -15,7 +15,11 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 30px 0 10px;
     }
 
     /* LOADER */
@@ -42,6 +46,53 @@
       to { transform: rotate(360deg); }
     }
 
+    /* TOP 3 CARDS */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .card h3 {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .gold { color: #d97706; }
+    .silver { color: #9ca3af; }
+    .bronze { color: #b45309; }
+
+    /* CONTROLS */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    input, select {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+
     /* TABLE */
     table {
       width: 100%;
@@ -58,33 +109,19 @@
     }
 
     th, td {
-      padding: 12px 14px;
-      text-align: left;
+      padding: 12px;
       font-size: 14px;
-    }
-
-    th {
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.04em;
+      text-align: left;
     }
 
     tbody tr:nth-child(even) {
       background: #f9fafb;
     }
 
-    tbody tr:hover {
-      background: #eef2ff;
-    }
-
     .ranking {
-      font-weight: bold;
       text-align: center;
+      font-weight: bold;
     }
-
-    .top1 { color: #d97706; font-weight: bold; }
-    .top2 { color: #9ca3af; font-weight: bold; }
-    .top3 { color: #b45309; font-weight: bold; }
 
     .money {
       color: #16a34a;
@@ -97,32 +134,39 @@
       font-size: 12px;
       color: #888;
     }
-
-    @media (max-width: 768px) {
-      th, td {
-        font-size: 12px;
-        padding: 10px;
-      }
-    }
   </style>
 </head>
 <body>
 
-  <h1>🏆 Ranking de Vendedores</h1>
+<h1>🏆 Ranking de Vendedores</h1>
 
-  <!-- LOADING -->
-  <div id="loader">
-    <div class="spinner"></div>
-    <div>Carregando ranking...</div>
+<div id="loader">
+  <div class="spinner"></div>
+  <div>Carregando ranking...</div>
+</div>
+
+<div id="content" style="display:none;">
+
+  <!-- TOP 3 -->
+  <div class="grid" id="top3"></div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <input type="text" id="search" placeholder="Buscar vendedor..." />
+    <select id="limit">
+      <option value="all">Todos</option>
+      <option value="10">Top 10</option>
+      <option value="20">Top 20</option>
+    </select>
   </div>
 
-  <!-- TABELA -->
-  <table id="tabela" style="display:none;">
+  <!-- TABLE -->
+  <table>
     <thead>
       <tr>
         <th>#</th>
         <th>Vendedor</th>
-        <th>Qtde Total</th>
+        <th>Total</th>
         <th>Inteiras</th>
         <th>Meias</th>
         <th>Valor</th>
@@ -131,54 +175,98 @@
     <tbody id="tbody"></tbody>
   </table>
 
-  <footer>
-    Produced by Kenuiworks.cloud
-  </footer>
+</div>
 
-  <script>
-    const RANKING_URL = 'https://n8n.kenuiworks.cloud/webhook/ranking-vendedores';
+<footer>
+  Auto refresh a cada 30 segundos • Kenuiworks.cloud
+</footer>
 
-    function formatMoney(value) {
-      return Number(value).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      });
+<script>
+  const RANKING_URL = 'https://n8n.kenuiworks.cloud/webhook/ranking-vendedores';
+  const REFRESH_INTERVAL = 30000;
+
+  let fullData = [];
+
+  function money(v) {
+    return Number(v).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  }
+
+  function renderTop3(data) {
+    const el = document.getElementById('top3');
+    el.innerHTML = '';
+
+    const medals = ['gold', 'silver', 'bronze'];
+
+    data.slice(0, 3).forEach((v, i) => {
+      el.innerHTML += `
+        <div class="card ${medals[i]}">
+          <h3>${i + 1}º lugar</h3>
+          <p>${v.vendedor}</p>
+          <p>${money(v.valor)}</p>
+        </div>
+      `;
+    });
+  }
+
+  function renderTable() {
+    const search = document.getElementById('search').value.toLowerCase();
+    const limit = document.getElementById('limit').value;
+
+    let data = [...fullData];
+
+    if (search) {
+      data = data.filter(v =>
+        v.vendedor.toLowerCase().includes(search)
+      );
     }
 
+    if (limit !== 'all') {
+      data = data.slice(0, Number(limit));
+    }
+
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+
+    data.forEach(v => {
+      tbody.innerHTML += `
+        <tr>
+          <td class="ranking">${v.ranking}</td>
+          <td>${v.vendedor}</td>
+          <td>${v.qtdTotal}</td>
+          <td>${v.qtdInteiras}</td>
+          <td>${v.qtdMeias}</td>
+          <td class="money">${money(v.valor)}</td>
+        </tr>
+      `;
+    });
+  }
+
+  function loadData() {
     fetch(RANKING_URL)
-      .then(res => res.json())
+      .then(r => r.json())
       .then(data => {
-        const tbody = document.getElementById('tbody');
-
-        data.forEach(row => {
-          const tr = document.createElement('tr');
-
-          let rankClass = '';
-          if (row.ranking === 1) rankClass = 'top1';
-          if (row.ranking === 2) rankClass = 'top2';
-          if (row.ranking === 3) rankClass = 'top3';
-
-          tr.innerHTML = `
-            <td class="ranking ${rankClass}">${row.ranking}</td>
-            <td>${row.vendedor}</td>
-            <td>${row.qtdTotal}</td>
-            <td>${row.qtdInteiras}</td>
-            <td>${row.qtdMeias}</td>
-            <td class="money">${formatMoney(row.valor)}</td>
-          `;
-
-          tbody.appendChild(tr);
-        });
+        fullData = data;
+        renderTop3(data);
+        renderTable();
 
         document.getElementById('loader').style.display = 'none';
-        document.getElementById('tabela').style.display = 'table';
+        document.getElementById('content').style.display = 'block';
       })
-      .catch(err => {
-        console.error(err);
+      .catch(() => {
         document.getElementById('loader').innerText =
-          'Erro ao carregar ranking de vendedores';
+          'Erro ao carregar ranking';
       });
-  </script>
+  }
+
+  document.getElementById('search').addEventListener('input', renderTable);
+  document.getElementById('limit').addEventListener('change', renderTable);
+
+  loadData();
+  setInterval(loadData, REFRESH_INTERVAL);
+</script>
 
 </body>
 </html>
