@@ -163,6 +163,11 @@
       </div>
 
       <div class="card">
+        <h3>Qtd vendidas</h3>
+        <p><span id="qtdVendidas">—</span></p>
+      </div>
+
+      <div class="card">
         <h3>Inteiras vendidas</h3>
         <p><span id="qtdInteiras">—</span></p>
       </div>
@@ -184,6 +189,11 @@
       <div class="card">
         <h3>Total disponível</h3>
         <p class="money">R$ <span id="totalDisponiveis">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Qtd disponível</h3>
+        <p class="money">R$ <span id="qtdDisponiveis">—</span></p>
       </div>
 
       <div class="card">
@@ -221,11 +231,13 @@
         document.getElementById('qtdInteiras').innerText = data.qtdInteiras;
         document.getElementById('qtdMeias').innerText = data.qtdMeias;
         document.getElementById('qtdCortesias').innerText = data.qtdCortesias;
+        document.getElementById('qtdVendidas').innerText = data.qtdVendidos;
 
         document.getElementById('totalDisponiveis').innerText = formatBR(data.totalDisponiveis);
         document.getElementById('qtdInteirasDisponiveis').innerText = data.qtdInteirasDisponiveis;
         document.getElementById('qtdMeiasDisponiveis').innerText = data.qtdMeiasDisponiveis;
         document.getElementById('qtdCortesiasDisponiveis').innerText = data.qtdCortesiasDisponiveis;
+        document.getElementById('qtdDisponiveis').innerText = data.qtdDisponiveis;
 
         // TOP 3
         const ul = document.getElementById('top3List');
