@@ -1,110 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Vendas por Data</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Vendas por Data</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
-
-    canvas {
-      max-height: 400px;
-    }
-
-    #loader {
-      text-align: center;
-      margin-top: 50px;
-    }
-  </style>
+<style>
+body { font-family: Arial; background:#f4f6f8; padding:20px; }
+h1 { text-align:center; }
+.controls { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+button, input { padding:8px 12px; border-radius:8px; border:1px solid #ccc; }
+.card { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
+</style>
 </head>
 <body>
 
-<h1>📈 Vendas por Data</h1>
+<h1>📊 Vendas por Data</h1>
 
-<div id="loader">Carregando gráfico...</div>
+<div class="controls">
+  <button onclick="loadData(7)">Últimos 7 dias</button>
+  <button onclick="loadData(30)">Últimos 30 dias</button>
 
-<div class="card" style="display:none;" id="content">
+  <input type="date" id="start">
+  <input type="date" id="end">
+  <button onclick="loadCustom()">Aplicar</button>
+</div>
+
+<div class="card">
   <canvas id="grafico"></canvas>
 </div>
 
 <script>
-  const URL = 'https://n8n.kenuiworks.cloud/webhook/vendas/data';
+const BASE_URL = "https://n8n.kenuiworks.cloud/webhook/vendas-por-data";
+let chart;
 
+function buildChart(labels, inteira, meia) {
 
-  function formatMoney(v) {
-    return Number(v).toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-  }
+  if (chart) chart.destroy();
 
-  fetch(URL)
-    .then(r => r.json())
-    .then(data => {
-
-      const labels = data.map(item => item.data);
-      const valores = data.map(item => item.valor);
-
-      new Chart(document.getElementById('grafico'), {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Vendas (R$)',
-            data: valores,
-            borderWidth: 3,
-            tension: 0.3,
-            fill: true
-          }]
+  chart = new Chart(document.getElementById('grafico'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Inteira',
+          data: inteira,
+          borderWidth: 3,
+          tension: 0.3
         },
-        options: {
-          responsive: true,
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return formatMoney(context.parsed.y);
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              ticks: {
-                callback: function(value) {
-                  return 'R$ ' + value;
-                }
-              }
-            }
-          }
+        {
+          label: 'Meia',
+          data: meia,
+          borderWidth: 3,
+          tension: 0.3
         }
-      });
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' }
+      }
+    }
+  });
+}
 
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
-    })
-    .catch(() => {
-      document.getElementById('loader').innerText = 'Erro ao carregar gráfico';
-    });
+function loadData(period) {
+  fetch(`${BASE_URL}?period=${period}`)
+    .then(r => r.json())
+    .then(render);
+}
+
+function loadCustom() {
+  const start = document.getElementById('start').value;
+  const end = document.getElementById('end').value;
+  if (!start || !end) return alert("Selecione as datas");
+
+  fetch(`${BASE_URL}?start=${start}&end=${end}`)
+    .then(r => r.json())
+    .then(render);
+}
+
+function render(data) {
+  const labels = data.map(d => d.data);
+  const inteira = data.map(d => d.inteira);
+  const meia = data.map(d => d.meia);
+
+  buildChart(labels, inteira, meia);
+}
+
+loadData(7);
 </script>
 
 </body>
