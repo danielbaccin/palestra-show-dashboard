@@ -184,6 +184,16 @@
         <h3>Cortesias</h3>
         <p><span id="qtdCortesias">—</span></p>
       </div>
+
+      <div class="card">
+        <h3>Pix</h3>
+        <p><span id="qtdPix">—</span></p>
+      </div>
+
+      <div class="card">
+        <h3>Cartão</h3>
+        <p><span id="qtdCartao">—</span></p>
+      </div>
     </div>
 
     <!-- DISPONÍVEIS -->
@@ -235,6 +245,8 @@
         document.getElementById('qtdMeias').innerText = data.qtdMeias;
         document.getElementById('qtdCortesias').innerText = data.qtdCortesias;
         document.getElementById('qtdVendidas').innerText = data.qtdVendidos;
+        document.getElementById('qtdPix').innerText = data.qtdPix;
+        document.getElementById('qtdCartao').innerText = data.qtdCartao;
 
         document.getElementById('totalDisponiveis').innerText = formatBR(data.totalDisponiveis);
         document.getElementById('qtdInteirasDisponiveis').innerText = data.qtdInteirasDisponiveis;
