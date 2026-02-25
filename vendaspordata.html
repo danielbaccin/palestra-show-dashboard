@@ -1,109 +1,153 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Vendas por Data</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Vendas por Data</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+}
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      padding: 20px;
-    }
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
 
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
+.filter-group {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  font-weight: bold;
+}
 
-    canvas {
-      max-height: 400px;
-    }
+.filter-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
 
-    #loader {
-      text-align: center;
-      margin-top: 50px;
-    }
-  </style>
+canvas {
+  max-height: 400px;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  font-weight: bold;
+}
+</style>
 </head>
 <body>
 
-<h1>📈 Vendas por Data</h1>
+<h1>📊 Vendas por Data</h1>
 
-<div id="loader">Carregando gráfico...</div>
+<!-- FILTRO -->
+<div class="card">
+  <div class="filter-group">
+    <span>Período:</span>
 
-<div class="card" style="display:none;" id="content">
-  <canvas id="grafico"></canvas>
+    <label>
+      <input type="radio" name="period" value="7" checked>
+      Últimos 7 dias
+    </label>
+
+    <label>
+      <input type="radio" name="period" value="30">
+      Últimos 30 dias
+    </label>
+  </div>
+</div>
+
+<!-- GRÁFICO -->
+<div class="card">
+  <div id="loading" class="loading">Carregando gráfico...</div>
+  <canvas id="grafico" style="display:none;"></canvas>
 </div>
 
 <script>
-  const URL = 'https://n8n.kenuiworks.cloud/webhook/vendas/data';
+const BASE_URL = "https://n8n.kenuiworks.cloud/webhook/vendas-por-data";
+let chart;
 
-  function formatMoney(v) {
-    return Number(v).toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-  }
+function buildChart(labels, inteira, meia) {
 
-  fetch(URL)
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById('grafico'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Inteira',
+          data: inteira,
+          borderWidth: 3,
+          tension: 0.3
+        },
+        {
+          label: 'Meia',
+          data: meia,
+          borderWidth: 3,
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function loadData(period) {
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('grafico').style.display = 'none';
+
+  fetch(`${BASE_URL}?period=${period}`)
     .then(r => r.json())
     .then(data => {
 
-      const labels = data.map(item => item.data);
-      const valores = data.map(item => item.valor);
+      const labels = data.map(d => d.data);
+      const inteira = data.map(d => d.inteira);
+      const meia = data.map(d => d.meia);
 
-      new Chart(document.getElementById('grafico'), {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Vendas (R$)',
-            data: valores,
-            borderWidth: 3,
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return formatMoney(context.parsed.y);
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              ticks: {
-                callback: function(value) {
-                  return 'R$ ' + value;
-                }
-              }
-            }
-          }
-        }
-      });
+      buildChart(labels, inteira, meia);
 
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
-    })
-    .catch(() => {
-      document.getElementById('loader').innerText = 'Erro ao carregar gráfico';
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('grafico').style.display = 'block';
     });
+}
+
+document.querySelectorAll('input[name="period"]').forEach(radio => {
+  radio.addEventListener('change', e => {
+    loadData(e.target.value);
+  });
+});
+
+// Carrega 7 dias por padrão
+loadData(7);
+
 </script>
 
 </body>
