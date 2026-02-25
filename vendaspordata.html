@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Vendas por Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    canvas {
+      max-height: 400px;
+    }
+
+    #loader {
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📈 Vendas por Data</h1>
+
+<div id="loader">Carregando gráfico...</div>
+
+<div class="card" style="display:none;" id="content">
+  <canvas id="grafico"></canvas>
+</div>
+
+<script>
+  const URL = 'https://n8n.kenuiworks.cloud/webhook/vendas-por-data';
+
+  function formatMoney(v) {
+    return Number(v).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  }
+
+  fetch(URL)
+    .then(r => r.json())
+    .then(data => {
+
+      const labels = data.map(item => item.data);
+      const valores = data.map(item => item.valor);
+
+      new Chart(document.getElementById('grafico'), {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Vendas (R$)',
+            data: valores,
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return formatMoney(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function(value) {
+                  return 'R$ ' + value;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    })
+    .catch(() => {
+      document.getElementById('loader').innerText = 'Erro ao carregar gráfico';
+    });
+</script>
+
+</body>
+</html>
