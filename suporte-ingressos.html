@@ -184,14 +184,20 @@ tr.innerHTML=`
 <td>${ticket.status}</td>
 
 <td>
-<button class="reenviar"
-  onclick="abrirModal(
-  '${ticket.ID}',
-  '${ticket["Nome Comprador"]}',
-  '${ticket["Telefone Comprador"]}'
-  )">
-  Reenviar
+
+<button onclick="verTicket('${ticket.ID}')">
+Ver Ticket
 </button>
+
+<button class="reenviar"
+onclick="abrirModal(
+'${ticket.ID}',
+'${ticket["Nome Comprador"]}',
+'${ticket["Telefone Comprador"]}'
+)">
+Reenviar
+</button>
+
 </td>
 
 `
@@ -258,9 +264,19 @@ telefone: telefone
 alert("Ticket reenviado!")
 
 fecharModal()
-
+  
 }
 
+async function verTicket(id){
+
+const res = await fetch(`${URL_VER}?id=${id}`)
+const data = await res.json()
+
+const url = `https://SEU_DOMINIO_TICKETS/${data.image}`
+
+window.open(url,"_blank")
+
+}
 </script>
 
 </body>
