@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel de Suporte - Ingressos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+background:#f4f6f8;
+padding:20px;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+margin-bottom:20px;
+}
+
+input{
+padding:10px;
+width:260px;
+border-radius:6px;
+border:1px solid #ccc;
+margin-right:10px;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#2563eb;
+color:white;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:left;
+}
+
+tr:hover{
+background:#f9fafb;
+}
+
+.reenviar{
+background:#16a34a;
+}
+
+.loading{
+display:none;
+margin-top:15px;
+color:#555;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎟️ Suporte de Ingressos</h1>
+
+<div class="card">
+
+<input id="busca" placeholder="Buscar por nome, telefone, ID ou número">
+
+<button onclick="buscar()">Buscar</button>
+
+<div class="loading" id="loading">
+Carregando...
+</div>
+
+</div>
+
+<div class="card">
+
+<table id="tabela">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Número</th>
+<th>Comprador</th>
+<th>Tipo</th>
+<th>Telefone</th>
+<th>Status</th>
+<th>Ação</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+const URL_BUSCA="https://n8n.kenuiworks.cloud/webhook/ticket-busca"
+const URL_REENVIO="https://n8n.kenuiworks.cloud/webhook/ticket-reenvio"
+
+async function buscar(){
+
+const termo=document.getElementById("busca").value
+
+document.getElementById("loading").style.display="block"
+
+const res=await fetch(`${URL_BUSCA}?q=${termo}`)
+const dados=await res.json()
+
+document.getElementById("loading").style.display="none"
+
+const tbody=document.querySelector("#tabela tbody")
+
+tbody.innerHTML=""
+
+dados.forEach(ticket=>{
+
+const tr=document.createElement("tr")
+
+tr.innerHTML=`
+
+<td>${ticket.ID}</td>
+<td>${ticket["Número sorteio"]}</td>
+<td>${ticket["Nome Comprador"]}</td>
+<td>${ticket["Tipo ingresso"]}</td>
+<td>${ticket["Telefone Comprador"]}</td>
+<td>${ticket.status}</td>
+
+<td>
+<button class="reenviar"
+onclick="reenviar('${ticket.ID}','${ticket["Telefone Comprador"]}')">
+Reenviar
+</button>
+</td>
+
+`
+
+tbody.appendChild(tr)
+
+})
+
+}
+
+async function reenviar(id,telefone){
+
+const novo=prompt("Enviar para qual telefone?",telefone)
+
+if(!novo) return
+
+await fetch(URL_REENVIO,{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+id:id,
+telefone:novo
+})
+})
+
+alert("Ticket reenviado!")
+
+}
+
+</script>
+
+</body>
+</html>
