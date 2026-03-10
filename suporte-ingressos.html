@@ -75,6 +75,43 @@ color:#555;
 </style>
 </head>
 
+<div id="modal" style="display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+align-items:center;
+justify-content:center;">
+
+<div style="background:white;
+padding:25px;
+border-radius:10px;
+width:300px">
+
+<h3>Reenviar Ticket</h3>
+
+<label>Nome</label>
+<input id="modalNome" style="width:100%;margin-bottom:10px">
+
+<label>Telefone</label>
+<input id="modalTelefone" style="width:100%;margin-bottom:20px">
+
+<div style="display:flex;gap:10px">
+
+<button onclick="confirmarReenvio()">Enviar</button>
+
+<button onclick="fecharModal()" style="background:#999">
+Cancelar
+</button>
+
+</div>
+
+</div>
+
+</div>  
+
 <body>
 
 <h1>🎟️ Suporte de Ingressos</h1>
@@ -148,8 +185,12 @@ tr.innerHTML=`
 
 <td>
 <button class="reenviar"
-onclick="reenviar('${ticket.ID}','${ticket["Telefone Comprador"]}')">
-Reenviar
+  onclick="abrirModal(
+  '${ticket.ID}',
+  '${ticket["Nome Comprador"]}',
+  '${ticket["Telefone Comprador"]}'
+  )">
+  Reenviar
 </button>
 </td>
 
@@ -177,6 +218,46 @@ telefone:novo
 })
 
 alert("Ticket reenviado!")
+
+}
+
+let ticketAtual = null
+
+function abrirModal(id,nome,telefone){
+
+ticketAtual = id
+
+document.getElementById("modalNome").value = nome
+document.getElementById("modalTelefone").value = telefone
+
+document.getElementById("modal").style.display="flex"
+
+}
+
+function fecharModal(){
+
+document.getElementById("modal").style.display="none"
+
+}
+
+async function confirmarReenvio(){
+
+const nome = document.getElementById("modalNome").value
+const telefone = document.getElementById("modalTelefone").value
+
+await fetch(URL_REENVIO,{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+id: ticketAtual,
+nome: nome,
+telefone: telefone
+})
+})
+
+alert("Ticket reenviado!")
+
+fecharModal()
 
 }
 
