@@ -124,7 +124,7 @@ const termo=document.getElementById("busca").value
 
 document.getElementById("loading").style.display="block"
 
-const res=await fetch(`${URL_BUSCA}?q=${termo}`)
+const res=await fetch(`${URL_BUSCA}?q=${termo}&&token=999999`)
 const dados=await res.json()
 
 document.getElementById("loading").style.display="none"
