@@ -280,7 +280,7 @@ async function verTicket(id){
    const res = await fetch(`${URL_TICKET_IMAGE}?id=${id}`)
    const data = await res.json()
 
-   if(data.ticketUrl){
+   if(data.url){
      window.open(data.url,"_blank")
    }else{
      alert("Ticket não encontrado")
