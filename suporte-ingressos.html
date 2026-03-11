@@ -154,6 +154,7 @@ Carregando...
 
 const URL_BUSCA="https://n8n.kenuiworks.cloud/webhook/ticket-busca"
 const URL_REENVIO="https://n8n.kenuiworks.cloud/webhook/ticket-reenvio"
+const URL_TICKET_IMAGE="https://n8n.kenuiworks.cloud/webhook/ticket-image"
 
 async function buscar(){
 
@@ -185,7 +186,7 @@ tr.innerHTML=`
 
 <td>
 
-<button onclick="verTicket('${ticket.ID}')">
+<button id="btnVer" onclick="verTicket('${ticket.ID}')">
 Ver Ticket
 </button>
 
@@ -269,12 +270,28 @@ fecharModal()
 
 async function verTicket(id){
 
-const res = await fetch(`${URL_VER}?id=${id}`)
-const data = await res.json()
+ const btn = document.getElementById("btnVer")
 
-const url = `https://SEU_DOMINIO_TICKETS/${data.image}`
+ btn.disabled = true
+ btn.innerText = "Carregando..."
 
-window.open(url,"_blank")
+ try{
+
+   const res = await fetch(`${URL_TICKET_IMAGE}?id=${id}`)
+   const data = await res.json()
+
+   if(data.ticketUrl){
+     window.open(data.url,"_blank")
+   }else{
+     alert("Ticket não encontrado")
+   }
+
+ }catch(e){
+   alert("Erro ao carregar ticket")
+ }
+
+ btn.disabled = false
+ btn.innerText = "Ver Ticket"
 
 }
 </script>
