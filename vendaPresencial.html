@@ -131,9 +131,9 @@ box-shadow:0 0 0 3px rgba(22,163,74,0.3);
 <h3>Pagamento</h3>
 
 <div class="grid">
-<button class="pag" onclick="setPagamento('Pix',this)">Pix</button>
-<button class="pag" onclick="setPagamento('Dinheiro',this)">Dinheiro</button>
-<button class="pag" onclick="setPagamento('Cartão',this)">Cartão</button>
+<button class="tipo" onclick="setTipo('INTEIRA',this)">Inteira</button>
+<button class="tipo" onclick="setTipo('MEIA',this)">Meia</button>
+<button class="tipo" onclick="setTipo('CORTESIA',this)">Cortesia</button>
 </div>
 
 <button class="gerar" onclick="gerarIngresso()">GERAR INGRESSO</button>
@@ -149,91 +149,96 @@ box-shadow:0 0 0 3px rgba(22,163,74,0.3);
 
 <script>
 
-const WEBHOOK = "https://n8n.kenuiworks.cloud/webhook-test/venda-presencial"
+const WEBHOOK = "https://n8n.kenuiworks.cloud/webhook/venda-presencial"
 
 let tipo = ""
 let pagamento = ""
 
-function setTipo(t){
-tipo = t
+function setTipo(t, btn){
+
+  tipo = t
+
+  document.querySelectorAll(".tipo")
+    .forEach(b => b.classList.remove("active"))
+
+  btn.classList.add("active")
+
 }
 
-function setPagamento(p){
-pagamento = p
+function setPagamento(p, btn){
+
+  pagamento = p
+
+  document.querySelectorAll(".pag")
+    .forEach(b => b.classList.remove("active"))
+
+  btn.classList.add("active")
+
 }
 
 async function gerarIngresso(){
 
-const nome = document.getElementById("nome").value
-const telefone = document.getElementById("telefone").value
+  const nome = document.getElementById("nome").value
+  const telefone = document.getElementById("telefone").value
 
-if(!nome || !telefone || !tipo){
-alert("Preencha os dados")
-return
-}
+  const loading = document.getElementById("loading")
+  const msg = document.getElementById("msg")
 
-document.getElementById("loading").style.display="block"
-document.getElementById("msg").innerText=""
+  if(!nome || !telefone || !tipo){
+    alert("Preencha nome, telefone e tipo de ingresso")
+    return
+  }
 
-try{
+  loading.style.display = "block"
+  msg.innerText = ""
 
-const res = await fetch(WEBHOOK,{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-nome,
-telefone,
-tipo,
-pagamento,
-canal:"presencial"
-})
-})
+  try{
 
-const data = await res.json()
+    const res = await fetch(WEBHOOK,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        nome,
+        telefone,
+        tipo,
+        pagamento,
+        canal:"presencial"
+      })
+    })
 
-document.getElementById("loading").style.display="none"
+    const data = await res.json()
 
-document.getElementById("msg").innerText =
-"✅ Ingresso enviado para o WhatsApp!"
+    loading.style.display = "none"
 
-document.getElementById("nome").value=""
-document.getElementById("telefone").value=""
+    msg.innerText = "✅ Ingresso enviado para o WhatsApp!"
 
-}catch(e){
+    limparFormulario()
 
-document.getElementById("loading").style.display="none"
+  }catch(e){
 
-document.getElementById("msg").innerText =
-"❌ erro ao gerar ingresso"
+    loading.style.display = "none"
 
-}
+    msg.innerText = "❌ erro ao gerar ingresso"
 
-}
-
-  let tipo = ""
-let pagamento = ""
-
-function setTipo(t,btn){
-
-tipo = t
-
-document.querySelectorAll(".tipo")
-.forEach(b => b.classList.remove("active"))
-
-btn.classList.add("active")
+  }
 
 }
 
-function setPagamento(p,btn){
+function limparFormulario(){
 
-pagamento = p
+  document.getElementById("nome").value = ""
+  document.getElementById("telefone").value = ""
 
-document.querySelectorAll(".pag")
-.forEach(b => b.classList.remove("active"))
+  tipo = ""
+  pagamento = ""
 
-btn.classList.add("active")
+  document.querySelectorAll(".tipo")
+    .forEach(b => b.classList.remove("active"))
+
+  document.querySelectorAll(".pag")
+    .forEach(b => b.classList.remove("active"))
 
 }
 </script>
