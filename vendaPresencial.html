@@ -120,6 +120,14 @@ box-shadow:0 0 0 3px rgba(22,163,74,0.3);
 
 <input id="telefone" placeholder="Telefone (85999999999)">
 
+<input 
+id="quantidade" 
+type="number" 
+value="1" 
+min="1" 
+max="10"
+placeholder="Quantidade de ingressos">
+
 <h3>Tipo de ingresso</h3>
 
 <div class="grid">
@@ -178,8 +186,9 @@ function setPagamento(p, btn){
 
 async function gerarIngresso(){
 
-  const nome = document.getElementById("nome").value
-  const telefone = document.getElementById("telefone").value
+const nome = document.getElementById("nome").value
+const telefone = document.getElementById("telefone").value
+const quantidade = Number(document.getElementById("quantidade").value || 1)
 
   const loading = document.getElementById("loading")
   const msg = document.getElementById("msg")
@@ -199,11 +208,12 @@ async function gerarIngresso(){
       headers:{
         "Content-Type":"application/json"
       },
-      body:JSON.stringify({
+     body:JSON.stringify({
         nome,
         telefone,
         tipo,
         pagamento,
+        quantidade,
         canal:"presencial"
       })
     })
@@ -230,6 +240,7 @@ function limparFormulario(){
 
   document.getElementById("nome").value = ""
   document.getElementById("telefone").value = ""
+  document.getElementById("quantidade").value = 1
 
   tipo = ""
   pagamento = ""
