@@ -96,6 +96,17 @@ text-align:center;
 margin-top:10px;
 }
 
+.tipo.active{
+background:#1d4ed8;
+box-shadow:0 0 0 3px rgba(37,99,235,0.3);
+}
+
+.pag.active{
+background:#16a34a;
+color:white;
+box-shadow:0 0 0 3px rgba(22,163,74,0.3);
+}
+
 </style>
 </head>
 
@@ -112,17 +123,17 @@ margin-top:10px;
 <h3>Tipo de ingresso</h3>
 
 <div class="grid">
-<button class="tipo" onclick="setTipo('INTEIRA')">Inteira</button>
-<button class="tipo" onclick="setTipo('MEIA')">Meia</button>
-<button class="tipo" onclick="setTipo('CORTESIA')">Cortesia</button>
+<button class="tipo" onclick="setTipo('INTEIRA',this)">Inteira</button>
+<button class="tipo" onclick="setTipo('MEIA',this)">Meia</button>
+<button class="tipo" onclick="setTipo('CORTESIA',this)">Cortesia</button>
 </div>
 
 <h3>Pagamento</h3>
 
 <div class="grid">
-<button class="pag" onclick="setPagamento('Pix')">Pix</button>
-<button class="pag" onclick="setPagamento('Dinheiro')">Dinheiro</button>
-<button class="pag" onclick="setPagamento('Cartão')">Cartão</button>
+<button class="pag" onclick="setPagamento('Pix',this)">Pix</button>
+<button class="pag" onclick="setPagamento('Dinheiro',this)">Dinheiro</button>
+<button class="pag" onclick="setPagamento('Cartão',this)">Cartão</button>
 </div>
 
 <button class="gerar" onclick="gerarIngresso()">GERAR INGRESSO</button>
@@ -201,6 +212,30 @@ document.getElementById("msg").innerText =
 
 }
 
+  let tipo = ""
+let pagamento = ""
+
+function setTipo(t,btn){
+
+tipo = t
+
+document.querySelectorAll(".tipo")
+.forEach(b => b.classList.remove("active"))
+
+btn.classList.add("active")
+
+}
+
+function setPagamento(p,btn){
+
+pagamento = p
+
+document.querySelectorAll(".pag")
+.forEach(b => b.classList.remove("active"))
+
+btn.classList.add("active")
+
+}
 </script>
 
 </body>
