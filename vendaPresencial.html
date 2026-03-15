@@ -118,7 +118,7 @@ box-shadow:0 0 0 3px rgba(22,163,74,0.3);
 
 <input id="nome" placeholder="Nome do comprador">
 
-<input id="telefone" placeholder="Telefone (85999999999)">
+<input id="telefone" placeholder="Telefone (85999999999)" type="number" >
 
 <input 
 id="quantidade" 
@@ -139,9 +139,9 @@ placeholder="Quantidade de ingressos">
 <h3>Pagamento</h3>
 
 <div class="grid">
-<button class="tipo" onclick="setTipo('INTEIRA',this)">Inteira</button>
-<button class="tipo" onclick="setTipo('MEIA',this)">Meia</button>
-<button class="tipo" onclick="setTipo('CORTESIA',this)">Cortesia</button>
+<button class="pag" onclick="setPagamento('Pix',this)">Pix</button>
+<button class="pag" onclick="setPagamento('Dinheiro',this)">Dinheiro</button>
+<button class="pag" onclick="setPagamento('Cartão',this)">Cartão</button>
 </div>
 
 <button class="gerar" onclick="gerarIngresso()">GERAR INGRESSO</button>
