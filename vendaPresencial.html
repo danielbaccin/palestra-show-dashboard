@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Venda de Ingressos</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f8;
+padding:20px;
+}
+
+h1{
+text-align:center;
+margin-bottom:25px;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+input{
+width:100%;
+padding:14px;
+margin-bottom:12px;
+font-size:16px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:10px;
+margin-bottom:12px;
+}
+
+button{
+padding:14px;
+font-size:16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.tipo{
+background:#2563eb;
+color:white;
+}
+
+.pag{
+background:#e5e7eb;
+}
+
+.gerar{
+width:100%;
+background:#16a34a;
+color:white;
+font-size:18px;
+margin-top:10px;
+}
+
+.loading{
+display:none;
+text-align:center;
+margin-top:10px;
+}
+
+.spinner{
+width:24px;
+height:24px;
+border:3px solid #ddd;
+border-top:3px solid #333;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+
+@keyframes spin{
+from{transform:rotate(0deg)}
+to{transform:rotate(360deg)}
+}
+
+.sucesso{
+color:green;
+text-align:center;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎟 Venda de Ingressos</h1>
+
+<div class="container">
+
+<input id="nome" placeholder="Nome do comprador">
+
+<input id="telefone" placeholder="Telefone (85999999999)">
+
+<h3>Tipo de ingresso</h3>
+
+<div class="grid">
+<button class="tipo" onclick="setTipo('INTEIRA')">Inteira</button>
+<button class="tipo" onclick="setTipo('MEIA')">Meia</button>
+<button class="tipo" onclick="setTipo('CORTESIA')">Cortesia</button>
+</div>
+
+<h3>Pagamento</h3>
+
+<div class="grid">
+<button class="pag" onclick="setPagamento('Pix')">Pix</button>
+<button class="pag" onclick="setPagamento('Dinheiro')">Dinheiro</button>
+<button class="pag" onclick="setPagamento('Cartão')">Cartão</button>
+</div>
+
+<button class="gerar" onclick="gerarIngresso()">GERAR INGRESSO</button>
+
+<div class="loading" id="loading">
+<div class="spinner"></div>
+<div>Gerando ingresso...</div>
+</div>
+
+<div class="sucesso" id="msg"></div>
+
+</div>
+
+<script>
+
+const WEBHOOK = "https://n8n.kenuiworks.cloud/webhook/venda-presencial"
+
+let tipo = ""
+let pagamento = ""
+
+function setTipo(t){
+tipo = t
+}
+
+function setPagamento(p){
+pagamento = p
+}
+
+async function gerarIngresso(){
+
+const nome = document.getElementById("nome").value
+const telefone = document.getElementById("telefone").value
+
+if(!nome || !telefone || !tipo){
+alert("Preencha os dados")
+return
+}
+
+document.getElementById("loading").style.display="block"
+document.getElementById("msg").innerText=""
+
+try{
+
+const res = await fetch(WEBHOOK,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+nome,
+telefone,
+tipo,
+pagamento,
+canal:"presencial"
+})
+})
+
+const data = await res.json()
+
+document.getElementById("loading").style.display="none"
+
+document.getElementById("msg").innerText =
+"✅ Ingresso enviado para o WhatsApp!"
+
+document.getElementById("nome").value=""
+document.getElementById("telefone").value=""
+
+}catch(e){
+
+document.getElementById("loading").style.display="none"
+
+document.getElementById("msg").innerText =
+"❌ erro ao gerar ingresso"
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
