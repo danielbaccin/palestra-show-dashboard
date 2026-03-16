@@ -181,7 +181,7 @@ font-weight:bold;
 <div class="grid">
 <button class="pag" onclick="setPagamento('Pix',this)">Pix</button>
 <button class="pag" onclick="setPagamento('Dinheiro',this)">Dinheiro</button>
-<button class="pag" onclick="setPagamento('Cartão',this)">Cartão</button>
+<button class="pag" onclick="setPagamento('Crédito',this)">Cartão</button>
 </div>
 
 <button class="gerar" onclick="gerarIngresso()">GERAR INGRESSO</button>
@@ -197,7 +197,7 @@ font-weight:bold;
 
 <script>
 
-const WEBHOOK = "https://n8n.kenuiworks.cloud/webhook-test/venda-presencial"
+const WEBHOOK = "https://n8n.kenuiworks.cloud/webhook/venda-presencial"
 
 let tipo = ""
 let pagamento = ""
