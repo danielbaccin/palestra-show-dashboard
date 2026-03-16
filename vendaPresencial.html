@@ -226,11 +226,12 @@ function setPagamento(p, btn){
 
 async function gerarIngresso(){
 
-const nome = document.getElementById("nome").value
-const telefone = document.getElementById("telefone").value
-const quantidade = Number(
-  document.querySelector('input[name="quantidade"]:checked').value
-)
+  const nome = document.getElementById("nome").value
+  const telefone = document.getElementById("telefone").value
+
+  const quantidade = Number(
+    document.querySelector('input[name="quantidade"]:checked').value
+  )
 
   const loading = document.getElementById("loading")
   const msg = document.getElementById("msg")
@@ -250,25 +251,31 @@ const quantidade = Number(
       headers:{
         "Content-Type":"application/json"
       },
-     body:JSON.stringify({
+      body:JSON.stringify({
         nome,
         telefone,
         tipo,
         pagamento,
         quantidade,
-        canal:"PRESENCIAL"
+        canal:"presencial"
       })
     })
+
+    if(!res.ok){
+      throw new Error("Erro HTTP " + res.status)
+    }
 
     const data = await res.json()
 
     loading.style.display = "none"
 
-    msg.innerText = "✅ Ingresso enviado para o WhatsApp!"
+    msg.innerText = "✅ " + (data.success || "Ingressos emitidos com sucesso")
 
     limparFormulario()
 
   }catch(e){
+
+    console.error(e)
 
     loading.style.display = "none"
 
