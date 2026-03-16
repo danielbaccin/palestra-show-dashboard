@@ -257,7 +257,7 @@ async function gerarIngresso(){
         tipo,
         pagamento,
         quantidade,
-        canal:"presencial"
+        canal:"PRESENCIAL"
       })
     })
 
@@ -289,16 +289,20 @@ function limparFormulario(){
 
   document.getElementById("nome").value = ""
   document.getElementById("telefone").value = ""
-  document.getElementById("quantidade").value = 1
 
   tipo = ""
   pagamento = ""
 
+  // reset tipo
   document.querySelectorAll(".tipo")
     .forEach(b => b.classList.remove("active"))
 
+  // reset pagamento
   document.querySelectorAll(".pag")
     .forEach(b => b.classList.remove("active"))
+
+  // reset quantidade
+  document.querySelector('input[name="quantidade"][value="1"]').checked = true
 
 }
 </script>
