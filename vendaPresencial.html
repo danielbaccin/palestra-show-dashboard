@@ -184,6 +184,18 @@ font-weight:bold;
 <button class="pag" onclick="setPagamento('Crédito',this)">Cartão</button>
 </div>
 
+<h3>Comprovante (opcional)</h3>
+
+<input 
+  type="file" 
+  id="comprovante" 
+  accept="image/*" 
+  capture="environment"
+  style="margin-bottom:10px;"
+>
+
+<img id="preview" style="width:100%; display:none; border-radius:8px; margin-bottom:10px;" />
+
 <button class="gerar" onclick="gerarIngresso()">GERAR INGRESSO</button>
 
 <div class="loading" id="loading">
@@ -244,6 +256,20 @@ async function gerarIngresso(){
   loading.style.display = "block"
   msg.innerText = ""
 
+  let comprovanteBase64 = null
+
+  const fileInput = document.getElementById("comprovante")
+  
+  if(fileInput.files.length > 0){
+    const file = fileInput.files[0]
+  
+    comprovanteBase64 = await new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result)
+      reader.readAsDataURL(file)
+    })
+  }
+
   try{
 
     const res = await fetch(WEBHOOK,{
@@ -257,7 +283,8 @@ async function gerarIngresso(){
         tipo,
         pagamento,
         quantidade,
-        canal:"PRESENCIAL"
+        canal:"PRESENCIAL",
+        comprovante: comprovanteBase64
       })
     })
 
@@ -305,6 +332,22 @@ function limparFormulario(){
   document.querySelector('input[name="quantidade"][value="1"]').checked = true
 
 }
+
+  document.getElementById("comprovante").addEventListener("change", function(e){
+  const file = e.target.files[0]
+
+  if(file){
+    const reader = new FileReader()
+
+    reader.onload = function(evt){
+      const img = document.getElementById("preview")
+      img.src = evt.target.result
+      img.style.display = "block"
+    }
+
+    reader.readAsDataURL(file)
+  }
+})
 </script>
 
 </body>
