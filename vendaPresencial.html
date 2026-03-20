@@ -355,6 +355,19 @@ function limparFormulario(){
   document.querySelectorAll(".pag").forEach(b => b.classList.remove("active"))
 
   document.querySelector('input[name="quantidade"][value="1"]').checked = true
+
+  // limpar comprovante
+  const fileInput = document.getElementById("comprovante")
+  if(fileInput){
+    fileInput.value = ""
+  }
+  
+  // limpar preview
+  const preview = document.getElementById("preview")
+  if(preview){
+    preview.src = ""
+    preview.style.display = "none"
+  }
 }
 
 // preview imagem
