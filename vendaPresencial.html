@@ -213,25 +213,15 @@ let tipo = ""
 let pagamento = ""
 
 function setTipo(t, btn){
-
   tipo = t
-
-  document.querySelectorAll(".tipo")
-    .forEach(b => b.classList.remove("active"))
-
+  document.querySelectorAll(".tipo").forEach(b => b.classList.remove("active"))
   btn.classList.add("active")
-
 }
 
 function setPagamento(p, btn){
-
   pagamento = p
-
-  document.querySelectorAll(".pag")
-    .forEach(b => b.classList.remove("active"))
-
+  document.querySelectorAll(".pag").forEach(b => b.classList.remove("active"))
   btn.classList.add("active")
-
 }
 
 async function gerarIngresso(){
@@ -257,16 +247,16 @@ async function gerarIngresso(){
   let comprovanteBase64 = null
 
   const fileInput = document.getElementById("comprovante")
-  
-  if(fileInput.files.length > 0){
-    const file = fileInput.files[0]
-  
-    comprovanteBase64 = await compressImage(file)
-}
-  }
 
-  console.log("Original:", file.size / 1024, "KB")
-  console.log("Comprimido:", comprovanteBase64.length / 1024, "KB")
+  if(fileInput && fileInput.files.length > 0){
+    const file = fileInput.files[0]
+
+    console.log("Original:", (file.size / 1024).toFixed(0), "KB")
+
+    comprovanteBase64 = await compressImage(file)
+
+    console.log("Comprimido:", (comprovanteBase64.length / 1024).toFixed(0), "KB")
+  }
 
   try{
 
@@ -280,6 +270,7 @@ async function gerarIngresso(){
         telefone,
         tipo,
         pagamento,
+        quantidade,
         canal:"presencial",
         comprovante: comprovanteBase64
       })
@@ -289,11 +280,17 @@ async function gerarIngresso(){
       throw new Error("Erro HTTP " + res.status)
     }
 
-    const data = await res.json()
+    let data = {}
+
+    try{
+      data = await res.json()
+    }catch(e){
+      console.warn("Resposta não é JSON")
+    }
 
     loading.style.display = "none"
 
-    msg.innerText = "✅ " + (data.success || "Ingressos emitidos com sucesso")
+    msg.innerText = "✅ " + (data?.success || "Ingressos emitidos com sucesso")
 
     limparFormulario()
 
@@ -309,64 +306,7 @@ async function gerarIngresso(){
 
 }
 
-async function compressImage(file, maxWidth = 800, quality = 0.7) {
-  return new Promise((resolve) => {
-    const img = new Image()
-    const reader = new FileReader()
-
-    reader.onload = (e) => {
-      img.src = e.target.result
-    }
-
-    img.onload = () => {
-      const canvas = document.createElement("canvas")
-
-      let width = img.width
-      let height = img.height
-
-      // redimensiona mantendo proporção
-      if (width > maxWidth) {
-        height *= maxWidth / width
-        width = maxWidth
-      }
-
-      canvas.width = width
-      canvas.height = height
-
-      const ctx = canvas.getContext("2d")
-      ctx.drawImage(img, 0, 0, width, height)
-
-      // converte para JPEG comprimido
-      const base64 = canvas.toDataURL("image/jpeg", quality)
-
-      resolve(base64)
-    }
-
-    reader.readAsDataURL(file)
-  })
-}
-
-function limparFormulario(){
-
-  document.getElementById("nome").value = ""
-  document.getElementById("telefone").value = ""
-
-  tipo = ""
-  pagamento = ""
-
-  // reset tipo
-  document.querySelectorAll(".tipo")
-    .forEach(b => b.classList.remove("active"))
-
-  // reset pagamento
-  document.querySelectorAll(".pag")
-    .forEach(b => b.classList.remove("active"))
-
-  // reset quantidade
-  document.querySelector('input[name="quantidade"][value="1"]').checked = true
-
-}
-
+// 🔥 única versão da função
 function compressImage(file, maxWidth = 800, quality = 0.7){
   return new Promise((resolve) => {
 
@@ -404,22 +344,36 @@ function compressImage(file, maxWidth = 800, quality = 0.7){
   })
 }
 
-document.getElementById("comprovante").addEventListener("change", function(e){
-  const file = e.target.files[0]
+function limparFormulario(){
+  document.getElementById("nome").value = ""
+  document.getElementById("telefone").value = ""
 
+  tipo = ""
+  pagamento = ""
+
+  document.querySelectorAll(".tipo").forEach(b => b.classList.remove("active"))
+  document.querySelectorAll(".pag").forEach(b => b.classList.remove("active"))
+
+  document.querySelector('input[name="quantidade"][value="1"]').checked = true
+}
+
+// preview imagem
+document.getElementById("comprovante")?.addEventListener("change", function(e){
+  const file = e.target.files[0]
   if(!file) return
 
   const reader = new FileReader()
   reader.onload = function(evt){
     const img = document.getElementById("preview")
-    img.src = evt.target.result
-    img.style.display = "block"
+    if(img){
+      img.src = evt.target.result
+      img.style.display = "block"
+    }
   }
 
   reader.readAsDataURL(file)
 })
 
-  
 </script>
 
 </body>
