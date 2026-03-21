@@ -99,7 +99,7 @@
 
     try {
       // já chama o webhook em paralelo (rápido)
-      const responsePromise = fetch("SEU_WEBHOOK_URL");
+      const responsePromise = fetch("https://n8n.kenuiworks.cloud/webhook/sorteio");
 
       // segura o suspense por 5 segundos
       await new Promise(resolve => setTimeout(resolve, 5000));
