@@ -76,27 +76,56 @@
 
   <script>
     async function sortear() {
-      const btn = document.querySelector("button");
-      const nomeEl = document.getElementById("nome");
-      const numeroEl = document.getElementById("numero");
+    const btn = document.querySelector("button");
+    const nomeEl = document.getElementById("nome");
+    const numeroEl = document.getElementById("numero");
 
-      btn.disabled = true;
-      nomeEl.innerText = "Sorteando... 🎲";
-      numeroEl.innerText = "";
+    btn.disabled = true;
+    numeroEl.innerText = "";
 
-      try {
-        const res = await fetch("https://n8n.kenuiworks.cloud/webhook/sorteio");
-        const data = await res.json();
+    // nomes fake pra dar efeito de roleta
+    const nomesFake = [
+      "Ana", "Carlos", "Juliana", "Pedro", "Fernanda",
+      "Lucas", "Mariana", "Rafael", "Beatriz"
+    ];
 
-        nomeEl.innerText = data.nome;
-        numeroEl.innerText = "Ingresso #" + data.id;
+    let i = 0;
 
-      } catch (err) {
-        nomeEl.innerText = "Erro no sorteio 😢";
-      }
+    // animação rolando
+    const intervalo = setInterval(() => {
+      nomeEl.innerText = nomesFake[i % nomesFake.length];
+      i++;
+    }, 100);
 
-      btn.disabled = false;
+    try {
+      // já chama o webhook em paralelo (rápido)
+      const responsePromise = fetch("SEU_WEBHOOK_URL");
+
+      // segura o suspense por 5 segundos
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      // pega o resultado
+      const res = await responsePromise;
+      const data = await res.json();
+
+      // para animação
+      clearInterval(intervalo);
+
+      // pequeno delay dramático 😏
+      nomeEl.innerText = "E o ganhador é...";
+      await new Promise(r => setTimeout(r, 1500));
+
+      // revela
+      nomeEl.innerText = data.nome;
+      numeroEl.innerText = "Ingresso #" + data.numero;
+
+    } catch (err) {
+      clearInterval(intervalo);
+      nomeEl.innerText = "Erro no sorteio 😢";
     }
+
+    btn.disabled = false;
+  }
   </script>
 
 </body>
