@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorteio 🎁</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .premio {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #facc15;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    #resultado {
+      margin: 40px 0;
+    }
+
+    #nome {
+      font-size: 4rem;
+      font-weight: bold;
+    }
+
+    #numero {
+      font-size: 2rem;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      background: #22c55e;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="premio">
+    🎁 Prêmio: 3 diárias no Hotel Jeri, com acompanhante
+  </div>
+
+  <h1>SORTEIO ESPECIAL</h1>
+
+  <div id="resultado">
+    <div id="nome">Clique para sortear</div>
+    <div id="numero"></div>
+  </div>
+
+  <button onclick="sortear()">Sortear</button>
+
+  <script>
+    async function sortear() {
+      const btn = document.querySelector("button");
+      const nomeEl = document.getElementById("nome");
+      const numeroEl = document.getElementById("numero");
+
+      btn.disabled = true;
+      nomeEl.innerText = "Sorteando... 🎲";
+      numeroEl.innerText = "";
+
+      try {
+        const res = await fetch("https://n8n.kenuiworks.cloud/webhook/sorteio");
+        const data = await res.json();
+
+        nomeEl.innerText = data.nome;
+        numeroEl.innerText = "Ingresso #" + data.id;
+
+      } catch (err) {
+        nomeEl.innerText = "Erro no sorteio 😢";
+      }
+
+      btn.disabled = false;
+    }
+  </script>
+
+</body>
+</html>
