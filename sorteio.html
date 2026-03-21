@@ -1,132 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Sorteio 🎁</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<title>Sorteio 🎁</title>
 
-    .premio {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: #facc15;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle, #0f172a, #020617);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    text-align: center;
+  }
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
+  .premio {
+    font-size: 1.5rem;
+    color: #facc15;
+    margin-bottom: 10px;
+  }
 
-    #resultado {
-      margin: 40px 0;
-    }
+  h1 {
+    font-size: 2.5rem;
+  }
 
-    #nome {
-      font-size: 4rem;
-      font-weight: bold;
-    }
+  #nome {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-top: 40px;
+    transition: all 0.5s ease;
+  }
 
-    #numero {
-      font-size: 2rem;
-      opacity: 0.8;
-      margin-top: 10px;
-    }
+  #numero {
+    font-size: 2rem;
+    margin-top: 10px;
+    opacity: 0.8;
+  }
 
-    button {
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 10px;
-      background: #22c55e;
-      color: white;
-      cursor: pointer;
-    }
+  .winner {
+    color: #22c55e;
+    text-shadow: 0 0 20px #22c55e;
+    transform: scale(1.2);
+  }
 
-    button:disabled {
-      background: gray;
-      cursor: not-allowed;
-    }
-  </style>
+  button {
+    margin-top: 40px;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 10px;
+    background: #22c55e;
+    color: white;
+    cursor: pointer;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+</style>
 </head>
+
 <body>
 
-  <div class="premio">
-    🎁 Prêmio: 3 diárias no Hotel Jeri, com acompanhante
-  </div>
+<div class="premio">
+  🎁 3 diárias no Hotel Jeri, com acompanhante
+</div>
 
-  <h1>SORTEIO ESPECIAL</h1>
+<h1>SORTEIO ESPECIAL</h1>
 
-  <div id="resultado">
-    <div id="nome">Clique para sortear</div>
-    <div id="numero"></div>
-  </div>
+<div id="nome">Prepare-se...</div>
+<div id="numero"></div>
 
-  <button onclick="sortear()">Sortear</button>
+<button onclick="sortear()">Sortear</button>
 
-  <script>
-    async function sortear() {
-    const btn = document.querySelector("button");
-    const nomeEl = document.getElementById("nome");
-    const numeroEl = document.getElementById("numero");
+<canvas id="confetti"></canvas>
 
-    btn.disabled = true;
-    numeroEl.innerText = "";
+<audio id="drum" src="https://actions.google.com/sounds/v1/drums/drum_roll.ogg"></audio>
+<audio id="win" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 
-    // nomes fake pra dar efeito de roleta
-    const nomesFake = [
-      "Ana", "Carlos", "Juliana", "Pedro", "Fernanda",
-      "Lucas", "Mariana", "Rafael", "Beatriz"
-    ];
+<script>
+async function sortear() {
+  const btn = document.querySelector("button");
+  const nomeEl = document.getElementById("nome");
+  const numeroEl = document.getElementById("numero");
 
-    let i = 0;
+  btn.disabled = true;
+  numeroEl.innerText = "";
+  nomeEl.classList.remove("winner");
 
-    // animação rolando
-    const intervalo = setInterval(() => {
-      nomeEl.innerText = nomesFake[i % nomesFake.length];
-      i++;
-    }, 100);
+  const nomesFake = ["Ana","Carlos","Juliana","Pedro","Fernanda","Lucas","Mariana"];
 
-    try {
-      // já chama o webhook em paralelo (rápido)
-      const responsePromise = fetch("https://n8n.kenuiworks.cloud/webhook/sorteio");
+  let i = 0;
 
-      // segura o suspense por 5 segundos
-      await new Promise(resolve => setTimeout(resolve, 5000));
+  const intervalo = setInterval(() => {
+    nomeEl.innerText = nomesFake[i % nomesFake.length];
+    i++;
+  }, 80);
 
-      // pega o resultado
-      const res = await responsePromise;
-      const data = await res.json();
+  document.getElementById("drum").play();
 
-      // para animação
-      clearInterval(intervalo);
+  const responsePromise = fetch("https://n8n.kenuiworks.cloud/webhook/sorteio");
 
-      // pequeno delay dramático 😏
-      nomeEl.innerText = "E o ganhador é...";
-      await new Promise(r => setTimeout(r, 1500));
+  await new Promise(r => setTimeout(r, 5000));
 
-      // revela
-      nomeEl.innerText = data.nome;
-      numeroEl.innerText = "Ingresso #" + data.numero;
+  clearInterval(intervalo);
 
-    } catch (err) {
-      clearInterval(intervalo);
-      nomeEl.innerText = "Erro no sorteio 😢";
-    }
+  nomeEl.innerText = "E O GANHADOR É...";
+  await new Promise(r => setTimeout(r, 1500));
 
-    btn.disabled = false;
+  const res = await responsePromise;
+  const data = await res.json();
+
+  nomeEl.innerText = data.nome;
+  numeroEl.innerText = "Ingresso #" + data.numero;
+
+  nomeEl.classList.add("winner");
+
+  document.getElementById("win").play();
+
+  startConfetti();
+
+  btn.disabled = false;
+}
+
+function startConfetti() {
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = Array.from({length: 150}).map(() => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 10 + 5,
+    speed: Math.random() * 3 + 2
+  }));
+
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    pieces.forEach(p => {
+      p.y += p.speed;
+      if (p.y > canvas.height) p.y = 0;
+
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    });
+
+    requestAnimationFrame(update);
   }
-  </script>
+
+  update();
+}
+</script>
 
 </body>
 </html>
