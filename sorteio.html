@@ -84,7 +84,8 @@
 <canvas id="confetti"></canvas>
 
 <audio id="drum" src="https://actions.google.com/sounds/v1/drums/drum_roll.ogg"></audio>
-<audio id="win" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+<audio id="win" src="https://actions.google.com/sounds/v1/cartoon/party_horn.ogg"></audio>
+<audio id="applause" src="https://actions.google.com/sounds/v1/human_voices/applause.ogg"></audio>
 
 <script>
 async function sortear() {
@@ -125,6 +126,7 @@ async function sortear() {
   nomeEl.classList.add("winner");
 
   document.getElementById("win").play();
+  document.getElementById("applause").play();
 
   startConfetti();
 
@@ -138,11 +140,14 @@ function startConfetti() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  const pieces = Array.from({length: 150}).map(() => ({
+  const colors = ["#22c55e", "#facc15", "#38bdf8", "#f472b6", "#fb7185"];
+
+  const pieces = Array.from({length: 180}).map(() => ({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    size: Math.random() * 10 + 5,
-    speed: Math.random() * 3 + 2
+    size: Math.random() * 8 + 4,
+    speed: Math.random() * 3 + 2,
+    color: colors[Math.floor(Math.random() * colors.length)]
   }));
 
   function update() {
@@ -150,8 +155,12 @@ function startConfetti() {
 
     pieces.forEach(p => {
       p.y += p.speed;
-      if (p.y > canvas.height) p.y = 0;
+      if (p.y > canvas.height) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
 
+      ctx.fillStyle = p.color;
       ctx.fillRect(p.x, p.y, p.size, p.size);
     });
 
